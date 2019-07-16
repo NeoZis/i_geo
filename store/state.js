@@ -1,3 +1,4 @@
 export default {
-    place: []
+    place: [],
+    id: 1
 }

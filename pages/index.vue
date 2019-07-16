@@ -1,18 +1,6 @@
 <template>
   <div class="container">
-    <div class="history overflow-auto">
-      <button @click="clear">Clear local storage</button>
-      <ul class="list-group">
-        <li v-for="plac in place"
-            class="list-group-item">
-          Место
-          <p @click="geocodeLatLng(plac.lat,plac.lng)">
-          Широта: {{plac.lat}}
-          Долгота: {{plac.lng}}
-          </p>
-        </li>
-      </ul>
-    </div>
+    <ViewPlaces />
     <div id="map_canvas" >
 
     </div>
@@ -21,8 +9,12 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import ViewPlaces from "~/components/ViewPlaces"
+
   export default {
+    components:{
+      ViewPlaces
+    },
     mounted() {
       this.$getLocation({
           enableHighAccuracy: true, //defaults to false
@@ -36,17 +28,13 @@ import {mapState} from 'vuex'
           var opt = {
             zoom: this.zoom
           };
+          var geocoder = new google.maps.Geocoder;
+          var position = {lat: coor.lat, lng: coor.lng};
           var map = new google.maps.Map(document.getElementById("map_canvas"), opt);
-          map.setCenter({
-            lat: coor.lat,
-            lng: coor.lng
-          });
+          map.setCenter(position);
           var marker = new google.maps.Marker({
             map: map,
-            position: {
-              lat: coor.lat,
-              lng: coor.lng
-            }
+            position: position
           });
         })
     },
@@ -55,37 +43,6 @@ import {mapState} from 'vuex'
         zoom: 15,
         coor: ''
       }
-    },
-    computed: mapState(["place"]),
-    methods: {
-      clear() {
-        this.$store.dispatch('clearLocStor');
-      },
-      geocodeLatLng(latPlace,lngPlace) {
-        var map = new google.maps.Map(document.getElementById("map_canvas"),{zoom:5, 
-        center: {lat: latPlace, lng: lngPlace}});
-        var geocoder = new google.maps.Geocoder;
-        var infowindow = new google.maps.InfoWindow;
-        var latlng = {lat: latPlace, lng: lngPlace};
-        geocoder.geocode({'location': latlng}, function(results, status) {
-          if (status === 'OK') {
-            if (results[0]) {
-              map.setZoom(16);
-              var marker = new google.maps.Marker({
-                position: latlng,
-                map: map
-              });
-              infowindow.setContent(results[0].formatted_address);
-              infowindow.open(map, marker);
-            } else {
-              window.alert('No results found');
-            }
-          } else {
-            window.alert('Geocoder failed due to: ' + status);
-          }
-        });
-      }
-
     }
     }
 </script>
@@ -103,14 +60,5 @@ import {mapState} from 'vuex'
   width: 600px;
   height: 600px;
   background-color: grey;
-}
-.history{
-  width: 600px;
-  height: 600px;
-  background-color: yellow;
-  margin-right: 20px;
-}
-li {
-  margin: 5px;
 }
 </style>

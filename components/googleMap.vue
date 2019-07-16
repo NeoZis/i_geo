@@ -1,44 +1,50 @@
 <template>
-<div class="google-map" :id="name">
-    </div>   
+    <div id="map_canvas" >
+
+    </div>
 </template>
 
 <script>
 export default {
-        name: 'google-map',
-        props: ['name'],
-        data: function () {
-            return {}
-        },
-        mounted: function () {
-            const element = document.getElementById(this.name)
-            const options = {
-                zoom: 14,
-                center: new google.maps.LatLng(59.93, 30.32)
-            }
-            this.map = new google.maps.Map(element, options)
-        },
-        methods: {
-        geoLocation () {
-        this.$getLocation({
-    enableHighAccuracy: true, //defaults to false
-    timeout: Infinity, //defaults to Infinity
-    maximumAge: 0 //defaults to 0
-    
-})
-  .then(coordinates => {
-    return coordinates;
-  });
+    mounted() {
+      this.$getLocation({
+          enableHighAccuracy: true, //defaults to false
+          timeout: Infinity, //defaults to Infinity
+          maximumAge: 0 //defaults to 0})
+        })
+        .then(coor => {
+          this.$store.dispatch('savePlace', {
+            ...coor
+          });
+          var opt = {
+            zoom: this.zoom
+          };
+          var geocoder = new google.maps.Geocoder;
+          var position = {
+            lat: coor.lat,
+            lng: coor.lng
+          };
+          var map = new google.maps.Map(document.getElementById("map_canvas"), opt);
+          map.setCenter(position);
+          var marker = new google.maps.Marker({
+            map: map,
+            position: position
+          });
+        })
+    },
+    data() {
+      return {
+        zoom: 15,
+        coor: ''
       }
-        }
+    }
 }
 </script>
 
 <style>
-    .google-map {
-        width: 640px;
-        height: 480px;
-        margin: 0 auto;
-        background: gray;
-    }
+#map_canvas{
+  width: 600px;
+  height: 600px;
+  background-color: grey;
+}
 </style>
