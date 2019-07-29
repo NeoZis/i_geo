@@ -1,4 +1,4 @@
-# chat_bot
+# i_geo
 
 > My spectacular Nuxt.js project
 
